@@ -6,7 +6,11 @@ namespace Faker
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            var faker = new Faker();
+            Foo foo = faker.Create<Foo>();
+            // Bar bar = new Bar();
+            // Console.WriteLine("{0}", bar.GetType().GetField("x").GetValue(bar));
+            Console.WriteLine("{0} {1}", foo.x, foo.y);
         }
     }
 }
