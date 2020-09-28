@@ -2,7 +2,7 @@
 
 namespace Faker
 {
-    public class BaseTypeGenerator
+    public class BaseTypeGenerator: IGenerator
     {
         private readonly Random _random = new Random();
 
@@ -24,7 +24,7 @@ namespace Faker
 
             return str;
         }
-        
+
         public object Next(Type type)
         {
             switch (Type.GetTypeCode(type))
@@ -59,6 +59,20 @@ namespace Faker
                 
                 default: return null;
             }
+        }
+        
+        public bool IsGeneratable(Type type)
+        {
+            if (type == typeof(byte) || type == typeof(sbyte) || type == typeof(short)
+                || type == typeof(ushort) || type == typeof(int) || type == typeof(uint)
+                || type == typeof(long) || type == typeof(ulong) || type == typeof(float)
+                || type == typeof(double) || type == typeof(decimal) || type == typeof(char)
+                || type == typeof(string) || type == typeof(bool))
+            {
+                return true;
+            }
+            
+            return false;
         }
     }
 }

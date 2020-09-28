@@ -1,37 +1,26 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Faker
 {
     public class TypeGenerator
     {
-        //possible made a list which can be updated
-        private readonly BaseTypeGenerator _baseTypeGenerator = new BaseTypeGenerator();
-        private readonly DateTimeGenerator _dateTimeGenerator = new DateTimeGenerator();
-        
-        private bool IsBaseType(Type type)
+        private List<IGenerator> generators = new List<IGenerator>();
+
+        public TypeGenerator()
         {
-            if (type == typeof(byte) || type == typeof(sbyte) || type == typeof(short)
-                || type == typeof(ushort) || type == typeof(int) || type == typeof(uint)
-                || type == typeof(long) || type == typeof(ulong) || type == typeof(float)
-                || type == typeof(double) || type == typeof(decimal) || type == typeof(char)
-                || type == typeof(string) || type == typeof(bool))
-            {
-                return true;
-            }
-            
-            return false;
+            generators.Add(new BaseTypeGenerator());
+            generators.Add(new DateTimeGenerator());
         }
 
         public object Generate(Type type)
         {
-            //possible create a self checking interface
-            if (IsBaseType(type))
+            foreach (var generator in generators)
             {
-                return _baseTypeGenerator.Next(type);
-            }
-            if (type == typeof(DateTime))
-            {
-                return _dateTimeGenerator.Next();
+                if (generator.IsGeneratable(type))
+                {
+                    return generator.Next(type);
+                }
             }
 
             return null;
