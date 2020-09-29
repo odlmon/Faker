@@ -1,9 +1,13 @@
-﻿namespace Faker
+﻿using System.Collections.Generic;
+
+namespace Faker
 {
+    [DTO]
     public class Foo
     {
         public int x;
         public string y;
+        public List<Bar> z;
 
         public Foo(int x)
         {
