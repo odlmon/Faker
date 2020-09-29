@@ -8,9 +8,11 @@ namespace Faker
         {
             var faker = new Faker();
             Foo foo = faker.Create<Foo>();
-            // Bar bar = new Bar();
-            // Console.WriteLine("{0}", bar.GetType().GetField("x").GetValue(bar));
             Console.WriteLine("{0} {1}", foo.x, foo.y);
+            foreach (var bar in foo.z)
+            {
+                Console.WriteLine("{0} {1}", bar.x, bar.y);
+            }
         }
     }
 }
