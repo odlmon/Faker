@@ -25,5 +25,18 @@ namespace Faker
 
             return null;
         }
+
+        public bool CanGenerate(Type type)
+        {
+            foreach (var generator in generators)
+            {
+                if (generator.IsGeneratable(type))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
     }
 }
