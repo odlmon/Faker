@@ -9,6 +9,8 @@ namespace Faker
     public class Faker
     {
         private readonly TypeGenerator _generator = new TypeGenerator();
+        
+        private Stack<Type> dtoInProgress = new Stack<Type>();
 
         private object GenerateWithFaker(Type type)
         {
@@ -17,10 +19,14 @@ namespace Faker
                 return _generator.Generate(type);
             }
 
-            if (IsFaker(type))
+            if (IsFaker(type) && !dtoInProgress.Contains(type))
             {
                 MethodInfo create = typeof(Faker).GetMethod("Create").MakeGenericMethod(type);
                 return create.Invoke(this, null);    
+            }
+            if (IsFaker(type) && dtoInProgress.Contains(type))
+            {
+                return null;
             }
 
             if (typeof(IEnumerable).IsAssignableFrom(type))
@@ -47,6 +53,25 @@ namespace Faker
             return null;
         }
 
+        private ConstructorInfo GetConstructor(Type type)
+        {
+            FieldInfo[] fields = type.GetFields();
+        
+            Type[] types = fields.Select(x => x.GetType()).ToArray();
+            ConstructorInfo constructor = type.GetConstructor(
+                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, 
+                null, types,null);
+        
+            if (constructor == null)
+            {
+                constructor = type.GetConstructors(
+                    BindingFlags.Public | BindingFlags.NonPublic 
+                                        | BindingFlags.Instance)[0];
+            }
+
+            return constructor;
+        }
+
         private object[] GenerateParameters(ConstructorInfo constructor)
         {
             List<object> parameters = new List<object>(
@@ -59,10 +84,12 @@ namespace Faker
             return parameters.ToArray();
         }
 
-        private void SetFields(object obj)
+        private void SetFieldsAndProperties(object obj)
         {
             obj.GetType().GetFields().ToList()
                 .ForEach(f => f.SetValue(obj, GenerateWithFaker(f.FieldType)));
+            obj.GetType().GetProperties().ToList()
+                .ForEach(p => p.SetValue(obj, GenerateWithFaker(p.PropertyType)));
         }
         
         public bool IsFaker(Type type)
@@ -77,23 +104,17 @@ namespace Faker
             {
                 return default;
             }
-            FieldInfo[] fields = type.GetFields();
-        
-            Type[] types = fields.Select(x => x.GetType()).ToArray();
-            ConstructorInfo constructor = type.GetConstructor(
-                BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance, 
-                null, types,null);
-        
-            if (constructor == null)
-            {
-                constructor = type.GetConstructors(
-                    BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)[0];
-            }
-        
+
+            dtoInProgress.Push(type);
+
+            ConstructorInfo constructor = GetConstructor(type);
+
             object[] parameters = GenerateParameters(constructor);
             object obj = constructor.Invoke(parameters);
         
-            SetFields(obj);
+            SetFieldsAndProperties(obj);
+
+            dtoInProgress.Pop();
             
             return (T) obj;
         }
