@@ -4,6 +4,6 @@
     public class Bar
     {
         public int x;
-        public bool y;
+        public Foo foo;
     }
 }

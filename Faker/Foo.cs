@@ -7,7 +7,9 @@ namespace Faker
     {
         public int x;
         public string y;
-        public List<Bar> z;
+        // public List<Bar> z;
+        public Bar z;
+        public int Num { get; set; }
 
         public Foo(int x)
         {
