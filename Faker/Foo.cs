@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace Faker
 {
@@ -9,7 +10,7 @@ namespace Faker
         public string y;
         // public List<Bar> z;
         public Bar z;
-        public int Num { get; set; }
+        public DateTime Num { get; set; }
 
         public Foo(int x)
         {
